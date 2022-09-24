@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import Filter from './components/Filter';
-import Query from './components/Query';
+import Countries from './components/Countries';
 
 
 const App = () => {
@@ -25,9 +25,9 @@ const App = () => {
   return (
     <>
       <Filter filter={filter} handler={handleFilterChange} />
-      <Query data={filteredCountries} /> 
+      <Countries countries={filteredCountries} /> 
     </>
-  );
+  )
 }
 
 export default App;

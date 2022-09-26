@@ -1,13 +1,13 @@
 const PersonForm = ({name, handleName, number, handleNumber, addPerson}) => (
-  <form>
+  <form onSubmit={addPerson}>
     <div>
-      name: <input value={name} onChange={handleName} />
+      name: <input value={name} onChange={handleName} required />
     </div>
     <div>
-      number: <input value={number} onChange={handleNumber} />
+      number: <input value={number} onChange={handleNumber} required />
     </div>
     <div>
-      <button type="submit" onClick={addPerson}>
+      <button>
           add
       </button>
     </div>

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
+import Notification from './components/Notification'
 import personService from './services/persons'
 
 const App = () => {
@@ -9,6 +10,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
+  const [message, setMessage] = useState(null)
 
   useEffect(() => {
     personService
@@ -42,6 +44,14 @@ const App = () => {
       personService
         .create(personObject)
         .then(returnPerson => setPersons(persons.concat(returnPerson)))
+        .then(() => {
+          setMessage(`Added ${personObject.name}`)
+          setTimeout(() => setMessage(null), 5000)
+        })
+        .catch((err) => {
+          setMessage(`Error:${err}`)
+          setTimeout(() => setMessage(null), 5000) 
+        })
     } else {
       if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one ?`)) {
         const modPerson = {...personObject, id: persons.filter(p => p.name === newName)[0].id}
@@ -56,17 +66,34 @@ const App = () => {
   const removePerson = (id, name) => {
     if (window.confirm(`Delete ${name} ?`)) {
       personService.remove(id)
+        .then(() => {
+          setMessage(`${name} was removed`)
+          setTimeout(() => setMessage(null), 5000)
+        })
+        .catch(() => {
+          setMessage(`Error:Information of ${name} has already been removed from server`)
+          setTimeout(() => setMessage(null), 5000)
+        })
       setPersons(persons.filter(p => p.id !== id))
     }
   }
 
   const updatePerson = (personObject) => {
     personService.update(personObject.id, personObject)
+      .then(() => {
+        setMessage(`${personObject.name}'s number was modified`)
+        setTimeout(() => setMessage(null), 5000)
+      })
+      .catch(() => {
+        setMessage(`Error:Information of ${personObject.name} has already been removed from server`)
+        setTimeout(() => setMessage(null, 5000))
+      })
   }
 
   return (
     <div>
       <h2>Phonebook</h2>
+        <Notification message={message} />
         <Filter newFilter={newFilter} handler={handleFilterChange} />
       <h3>Add a new</h3>
       <PersonForm

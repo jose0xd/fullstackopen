@@ -119,6 +119,8 @@ app.put('/api/persons/:id', (request, response) => {
     ? p
     : {...p, number: body.number}
   ))
+
+  response.json(persons)
 })
 
 app.get('/info', (request, response) => {

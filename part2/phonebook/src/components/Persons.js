@@ -1,5 +1,3 @@
-import personService from '../services/persons'
-
 const Persons = ({persons, removePerson}) => {
 
   return (

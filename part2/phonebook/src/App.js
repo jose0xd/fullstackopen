@@ -33,30 +33,38 @@ const App = () => {
 		setNewFilter(event.target.value)
   )
 
-  const addPerson = (event) => {
+  async function addPerson(event) {
     event.preventDefault()
     const personObject = {
       name: newName,
       number: newNumber,
       id: persons.length + 1
     }
-    if (!persons.some(e => e.name === newName)) {
+
+    // actual persons in the server
+    let actualPersons = []
+    await personService
+      .getAll()
+      .then(serverPersons => {
+        actualPersons = serverPersons
+      })
+
+    if (!actualPersons.some(e => e.name === newName)) {
       personService
         .create(personObject)
-        .then(returnPerson => setPersons(persons.concat(returnPerson)))
+        .then(returnPerson => setPersons(actualPersons.concat(returnPerson)))
         .then(() => {
           setMessage(`Added ${personObject.name}`)
           setTimeout(() => setMessage(null), 5000)
         })
         .catch((err) => {
           setMessage(`Error:${err}`)
-          setTimeout(() => setMessage(null), 5000) 
+          setTimeout(() => setMessage(null), 5000)
         })
     } else {
       if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one ?`)) {
-        const modPerson = {...personObject, id: persons.filter(p => p.name === newName)[0].id}
+        const modPerson = {...personObject, id: actualPersons.filter(p => p.name === newName)[0].id}
         updatePerson(modPerson)
-        setPersons(persons.map(p => p.name !== newName ? p : modPerson))
       }
     }
     setNewName('')
@@ -80,9 +88,10 @@ const App = () => {
 
   const updatePerson = (personObject) => {
     personService.update(personObject.id, personObject)
-      .then(() => {
+      .then((updatePersons) => {
         setMessage(`${personObject.name}'s number was modified`)
         setTimeout(() => setMessage(null), 5000)
+        setPersons(updatePersons)
       })
       .catch(() => {
         setMessage(`Error:Information of ${personObject.name} has already been removed from server`)

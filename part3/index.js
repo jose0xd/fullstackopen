@@ -1,8 +1,11 @@
 const morgan = require('morgan')
+const cors = require('cors')
 const express = require('express')
 const app = express()
 
+app.use(cors())
 app.use(express.json())
+app.use(express.static('build'))
 app.use(morgan(function (tokens, req, res) {
   return [
     tokens.method(req, res),
@@ -96,6 +99,28 @@ app.post('/api/persons', (request, response) => {
   response.json(person)
 })
 
+app.put('/api/persons/:id', (request, response) => {
+  const id = Number(request.params.id)
+  if (!persons.some(p => p.id === id)) {
+    return response.status(400).json({
+      error: `id ${id} does not exist`
+    })
+  }
+
+  const body = request.body
+  if (!body.name || !body.number) {
+    return response.status(400).json({
+      error: 'name or number missing'
+    })
+  }
+
+  persons = persons.map(p => (
+    p.id !== id
+    ? p
+    : {...p, number: body.number}
+  ))
+})
+
 app.get('/info', (request, response) => {
   const msg = `Phonebook has info for ${persons.length} people`
   response.send(
@@ -104,7 +129,7 @@ app.get('/info', (request, response) => {
   )
 })
 
-const PORT = 3001
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })

@@ -41,7 +41,7 @@ const App = () => {
       id: persons.length + 1
     }
 
-    // actual persons in the server
+    // actual persons in the server // FIX: two call to api
     let actualPersons = []
     await personService
       .getAll()
